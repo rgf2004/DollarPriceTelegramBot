@@ -151,7 +151,7 @@ public class DollarPriceApi implements Runnable {
 
 		try {
 			cfg.setDirectoryForTemplateLoading(
-					new File("C:/Users/feteha/Desktop/Temp/20161119/DollarPriceTelegramBot/bot.dollarprice/templates"));
+					new File("C:/png/templates"));
 			Template template = cfg.getTemplate("currencyDetails.ftl");
 			Map<String, Object> data = new HashMap<String, Object>();
 
@@ -220,6 +220,15 @@ public class DollarPriceApi implements Runnable {
 	}
 
 	public File getUSDCurrentCurrencyDetailsImage() {
+		if (usdCurrentCurrencyDetailsImage == null)
+		{
+			try {
+				Thread.sleep(2000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		return usdCurrentCurrencyDetailsImage;
 	}
 
