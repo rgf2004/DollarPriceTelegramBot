@@ -3,8 +3,8 @@ package com.telegram.bot.dollarprice.constants;
 public class DollarPriceConstants {
 
 	public static final String propertiesFileName = "dollarPrice.properties";
-	//public static final String TEMPLATE_PATH = "templates/currencyDetails.ftl";
-	//public static final String TEMPLATE_PATH = "C://Users/feteha/Desktop/Temp/20161119/DollarPriceTelegramBot/bot.dollarprice\templates\currencyDetails.ftl";
+	public static final String TEMPLATE_PATH = "template_path";
+	public static final String TEMPLATE_NAME = "currencyDetails.ftl";
 	
 	public static final long REFRESH_INTERVAL = 60000;
 	public static final String DATE_FORMAT_KEY = "date_format";

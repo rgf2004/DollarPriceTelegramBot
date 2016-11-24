@@ -131,8 +131,6 @@ public class DollarPriceApi implements Runnable {
 		
 		tempCurrencyDetails = new CurrencyDetails();
 		
-		// For Future use to support EURO
-		/*
 		banksPrices = getCurrentBankPrices(EURO_URL);
 
 		if (banksPrices == null)
@@ -144,7 +142,7 @@ public class DollarPriceApi implements Runnable {
 		tempCurrencyDetails.setLastUpdate(new Date());
 
 		euroCurrencyDetail = tempCurrencyDetails;
-		*/
+		
 
 	}
 
@@ -154,11 +152,11 @@ public class DollarPriceApi implements Runnable {
 
 		try {
 			cfg.setDirectoryForTemplateLoading(
-					new File("C:/png/templates"));
-			Template template = cfg.getTemplate("currencyDetails.ftl");
+					new File(config.getProperty(DollarPriceConstants.TEMPLATE_PATH)));
+			Template template = cfg.getTemplate(DollarPriceConstants.TEMPLATE_NAME);
 			Map<String, Object> data = new HashMap<String, Object>();
 
-			data.put("dollar_price_label", config.getProperty(DollarPriceConstants.HTML_DOLLAR_PRICE_LABEL));
+			data.put("price_label", config.getProperty(DollarPriceConstants.HTML_DOLLAR_PRICE_LABEL));
 			data.put("latest_update_date_label", config.getProperty(DollarPriceConstants.HTML_LATEST_UPDATE_DATE));
 
 			SimpleDateFormat sdf = new SimpleDateFormat(config.getProperty(DollarPriceConstants.DATE_FORMAT_KEY));

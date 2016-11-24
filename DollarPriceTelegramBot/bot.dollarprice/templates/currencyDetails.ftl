@@ -37,7 +37,7 @@
 		<div align="right">
 			<div>
 				<h1 style="font-family:Tahoma;font-weight: 450;font-size: 14px;">
-					${dollar_price_label}					
+					${price_label}					
 				</h1>
 			</div>
 			<div style="font-family:Tahoma;font-weight: 350;font-size: 12px;">
