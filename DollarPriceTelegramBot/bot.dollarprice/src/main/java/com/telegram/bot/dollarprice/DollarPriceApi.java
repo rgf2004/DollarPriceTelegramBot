@@ -131,6 +131,8 @@ public class DollarPriceApi implements Runnable {
 		
 		tempCurrencyDetails = new CurrencyDetails();
 		
+		// For Future use to support EURO
+		/*
 		banksPrices = getCurrentBankPrices(EURO_URL);
 
 		if (banksPrices == null)
@@ -142,6 +144,7 @@ public class DollarPriceApi implements Runnable {
 		tempCurrencyDetails.setLastUpdate(new Date());
 
 		euroCurrencyDetail = tempCurrencyDetails;
+		*/
 
 	}
 
