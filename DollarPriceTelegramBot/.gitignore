@@ -47,3 +47,4 @@ nbproject
 composer.lock
 target
 .classpath
+dependency-reduced-pom.xml
