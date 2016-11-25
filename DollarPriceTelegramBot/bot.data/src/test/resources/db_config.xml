@@ -45,7 +45,7 @@
 		<property name="ignoreResourceNotFound" value="true" />
 		<property name="locations">
 			<list>
-				<value>db-config.properties</value>
+				<value>application.properties</value>
 			</list>
 		</property>
 	</bean>

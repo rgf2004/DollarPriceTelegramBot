@@ -18,6 +18,8 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.telegram.bot.core.config.TelegramConfig;
+import com.telegram.bot.core.constants.TelegramConstants;
 import com.telegram.bot.core.httpclient.HttpClient;
 import com.telegram.bot.core.httpclient.beans.HttpGetRequest;
 import com.telegram.bot.dollarprice.beans.BankPrice;
@@ -41,13 +43,11 @@ public class DollarPriceApi implements Runnable {
 	private HttpClient httpClient = new HttpClient();
 
 	private final String USD_URL = "https://eldollarbkam.com/api/prices/usd/";
-	private CurrencyDetails usdCurrencyDetails = null;
 	private File usdCurrentCurrencyDetailsImage = null;
-	
+
 	private final String EURO_URL = "https://eldollarbkam.com/api/prices/eur/";
-	private CurrencyDetails euroCurrencyDetail = null;
 	private File euroCurrentCurrencyDetailsImage = null;
-	
+
 	public DollarPriceApi() {
 		input = this.getClass().getClassLoader().getResourceAsStream(DollarPriceConstants.propertiesFileName);
 
@@ -81,7 +81,7 @@ public class DollarPriceApi implements Runnable {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return null;
-		}						
+		}
 	}
 
 	private BankPrice getBestSellBankPrice(List<BankPrice> banksPrices) {
@@ -109,11 +109,11 @@ public class DollarPriceApi implements Runnable {
 	private void refreshCurrencyDetails() {
 
 		CurrencyDetails tempCurrencyDetails;
-		List<BankPrice> banksPrices ;
-		
+		List<BankPrice> banksPrices;
+		File tempFile;
+
 		tempCurrencyDetails = new CurrencyDetails();
 
-		
 		banksPrices = getCurrentBankPrices(USD_URL);
 
 		if (banksPrices == null)
@@ -124,13 +124,15 @@ public class DollarPriceApi implements Runnable {
 		tempCurrencyDetails.setBestBuyBank(getBestBuyBankPrice(banksPrices));
 		tempCurrencyDetails.setLastUpdate(new Date());
 
-		usdCurrencyDetails = tempCurrencyDetails;
+		// usdCurrencyDetails = tempCurrencyDetails;
 
-		saveCurrencyQueryResultAsImage();
+		tempFile = saveCurrencyQueryResultAsImage(tempCurrencyDetails,
+				config.getProperty(DollarPriceConstants.HTML_DOLLAR_PRICE_LABEL), usdCurrentCurrencyDetailsImage);
 		
-		
+		usdCurrentCurrencyDetailsImage = tempFile;
+
 		tempCurrencyDetails = new CurrencyDetails();
-		
+
 		banksPrices = getCurrentBankPrices(EURO_URL);
 
 		if (banksPrices == null)
@@ -141,26 +143,50 @@ public class DollarPriceApi implements Runnable {
 		tempCurrencyDetails.setBestBuyBank(getBestBuyBankPrice(banksPrices));
 		tempCurrencyDetails.setLastUpdate(new Date());
 
-		euroCurrencyDetail = tempCurrencyDetails;
+		tempFile= saveCurrencyQueryResultAsImage(tempCurrencyDetails,
+				config.getProperty(DollarPriceConstants.HTML_EURO_PRICE_LABEL), euroCurrentCurrencyDetailsImage);
 		
+		euroCurrentCurrencyDetailsImage = tempFile;
 
 	}
 
-	private String getCurrencyQueryResultAsHtml() {
+	private File saveCurrencyQueryResultAsImage(CurrencyDetails currencyDetails, String priceLabel,
+			File currentImageFile) {
+
+		HtmlImageGenerator htmlImageGenerator = new HtmlImageGenerator();
+
+		String html = getCurrencyQueryResultAsHtml(currencyDetails, priceLabel);
+
+		File tempFile = new File(TelegramConfig.getProperty(TelegramConstants.TEMP_FOLDER_PATH) + "/"
+				+ String.valueOf(new Date().getTime()) + ".png");
+
+		htmlImageGenerator.loadHtml(html);
+
+		htmlImageGenerator.saveAsImage(tempFile);
+
+		synchronized (this) {
+			if (currentImageFile != null) {
+				currentImageFile.delete();
+			}
+		}
+		
+		return tempFile;
+	}
+
+	private String getCurrencyQueryResultAsHtml(CurrencyDetails currencyDetails, String priceLabel) {
 
 		Configuration cfg = new Configuration();
 
 		try {
-			cfg.setDirectoryForTemplateLoading(
-					new File(config.getProperty(DollarPriceConstants.TEMPLATE_PATH)));
+			cfg.setDirectoryForTemplateLoading(new File(TelegramConfig.getProperty(TelegramConstants.TEMPLATE_PATH)));
 			Template template = cfg.getTemplate(DollarPriceConstants.TEMPLATE_NAME);
 			Map<String, Object> data = new HashMap<String, Object>();
 
-			data.put("price_label", config.getProperty(DollarPriceConstants.HTML_DOLLAR_PRICE_LABEL));
+			data.put("price_label", priceLabel);
 			data.put("latest_update_date_label", config.getProperty(DollarPriceConstants.HTML_LATEST_UPDATE_DATE));
 
 			SimpleDateFormat sdf = new SimpleDateFormat(config.getProperty(DollarPriceConstants.DATE_FORMAT_KEY));
-			data.put("latest_update_date", sdf.format(usdCurrencyDetails.getLastUpdate()));
+			data.put("latest_update_date", sdf.format(currencyDetails.getLastUpdate()));
 
 			data.put(DollarPriceConstants.BANK_KEYWORD_LABEL,
 					config.getProperty(DollarPriceConstants.BANK_KEYWORD_LABEL));
@@ -171,20 +197,14 @@ public class DollarPriceApi implements Runnable {
 
 			data.put(DollarPriceConstants.BEST_SELL_STRING,
 					String.format(config.getProperty(DollarPriceConstants.BEST_SELL_STRING),
-							usdCurrencyDetails.getBestSellBank().getBuy(),
-							usdCurrencyDetails.getBestSellBank().getBank().getName_ar()));
+							currencyDetails.getBestSellBank().getBuy(),
+							currencyDetails.getBestSellBank().getBank().getName_ar()));
 			data.put(DollarPriceConstants.BEST_BUY_STRING,
 					String.format(config.getProperty(DollarPriceConstants.BEST_BUY_STRING),
-							usdCurrencyDetails.getBestBuyBank().getSell(),
-							usdCurrencyDetails.getBestBuyBank().getBank().getName_ar()));
+							currencyDetails.getBestBuyBank().getSell(),
+							currencyDetails.getBestBuyBank().getBank().getName_ar()));
 
-			
-			data.put("banks", usdCurrencyDetails.getBankPrices());
-			
-			/*
-			 * Writer out = new OutputStreamWriter(System.out);
-			 * template.process(data, out); out.flush();
-			 */
+			data.put("banks", currencyDetails.getBankPrices());
 
 			StringWriter strWriter = new StringWriter();
 			template.process(data, strWriter);
@@ -198,46 +218,41 @@ public class DollarPriceApi implements Runnable {
 		}
 	}
 
-	private void saveCurrencyQueryResultAsImage() {
-
-		HtmlImageGenerator htmlImageGenerator = new HtmlImageGenerator();
-
-		String html = getCurrencyQueryResultAsHtml();
-
-		// logger.debug(html);
-
-		File tempFile = new File("c:\\png\\" + String.valueOf(new Date().getTime()) + ".png");
-
-		htmlImageGenerator.loadHtml(html);
-
-		htmlImageGenerator.saveAsImage(tempFile);
-
-		synchronized (this) {
-			if (usdCurrentCurrencyDetailsImage != null) {
-				usdCurrentCurrencyDetailsImage.delete();
+	public File getUSDCurrentCurrencyDetailsImage(String userQueryKey) {
+		File image = null;
+		if (config.getProperty(DollarPriceConstants.GET_CURRENT_PRICE_EURO_KEY).equalsIgnoreCase(userQueryKey)) {
+			if (euroCurrentCurrencyDetailsImage == null) {
+				try {
+					Thread.sleep(2000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
-			usdCurrentCurrencyDetailsImage = tempFile;
-		}
-	}
 
-	public File getUSDCurrentCurrencyDetailsImage() {
-		if (usdCurrentCurrencyDetailsImage == null)
-		{
-			try {
-				Thread.sleep(2000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			image = euroCurrentCurrencyDetailsImage;
+
+		} else {
+			if (usdCurrentCurrencyDetailsImage == null) {
+				try {
+					Thread.sleep(2000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
+
+			image = usdCurrentCurrencyDetailsImage;
 		}
-		return usdCurrentCurrencyDetailsImage;
+
+		return image;
 	}
 
 	public List<String> getKeyboards() {
 		List<String> keyboards = new ArrayList<>();
 
-		keyboards.add(config.getProperty(DollarPriceConstants.GET_CURRENT_PRICE_KEY));
-		// keyboards.add(config.getProperty(DollarPriceConstants.GET_HOURLY_PRICE_KEY));
+		keyboards.add(config.getProperty(DollarPriceConstants.GET_CURRENT_PRICE_USD_KEY));
+		keyboards.add(config.getProperty(DollarPriceConstants.GET_CURRENT_PRICE_EURO_KEY));
 
 		return keyboards;
 	}

@@ -3,7 +3,7 @@ package com.telegram.bot.dollarprice.constants;
 public class DollarPriceConstants {
 
 	public static final String propertiesFileName = "dollarPrice.properties";
-	public static final String TEMPLATE_PATH = "template_path";
+
 	public static final String TEMPLATE_NAME = "currencyDetails.ftl";
 	
 	public static final long REFRESH_INTERVAL = 60000;
@@ -21,9 +21,11 @@ public class DollarPriceConstants {
 	public static final String HTML_END_PART_KEY = "html_end_part";
 	
 	public static final String HTML_DOLLAR_PRICE_LABEL = "dollar_price_label";
+	public static final String HTML_EURO_PRICE_LABEL = "euro_price_label";
 	public static final String HTML_LATEST_UPDATE_DATE = "latest_update_date";
 	
-	public static final String GET_CURRENT_PRICE_KEY = "get_current_price";
+	public static final String GET_CURRENT_PRICE_USD_KEY = "get_current_price_usd";
+	public static final String GET_CURRENT_PRICE_EURO_KEY = "get_current_price_euro";
 	public static final String GET_HOURLY_PRICE_KEY = "get_hourly_price";
 	
 	public static final String IMAGE_CAPTION_KEY = "image_caption";

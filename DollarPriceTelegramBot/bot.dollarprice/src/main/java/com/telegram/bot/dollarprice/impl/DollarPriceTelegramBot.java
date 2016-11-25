@@ -8,10 +8,7 @@ import org.telegram.telegrambots.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.api.objects.replykeyboard.ReplyKeyboard;
-import org.telegram.telegrambots.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.api.objects.replykeyboard.buttons.InlineKeyboardButton;
-import org.telegram.telegrambots.api.objects.replykeyboard.buttons.KeyboardButton;
-import org.telegram.telegrambots.api.objects.replykeyboard.buttons.KeyboardRow;
 
 import com.telegram.bot.business.beans.TelegramBot;
 import com.telegram.bot.data.bot.model.Bot;
@@ -32,19 +29,22 @@ public class DollarPriceTelegramBot extends TelegramBot
 	public SendPhoto handleIncomingMessage(Update update) {
 				
 		String chatID = null;
+		String userQuery = null;
 		
 		if (update.getMessage() != null)
 		{
 			handleFirstTime(update.getMessage());
 			chatID = update.getMessage().getChatId().toString();
+			userQuery = update.getMessage().getText();
 		}
 		else
 		{
 			chatID = update.getCallbackQuery().getMessage().getChatId().toString();
+			userQuery = update.getCallbackQuery().getData();
 		}
 		
 		SendPhoto sendPhotoRequest = new SendPhoto();
-		sendPhotoRequest.setNewPhoto(dollarPriceApi.getUSDCurrentCurrencyDetailsImage());
+		sendPhotoRequest.setNewPhoto(dollarPriceApi.getUSDCurrentCurrencyDetailsImage(userQuery));
 		//sendPhotoRequest.setCaption(dollarPriceApi.getImageCaption());
 		sendPhotoRequest.setReplyMarkup(getKeyboardMarkup(update));
 		sendPhotoRequest.setChatId(chatID);
