@@ -45,7 +45,7 @@
 		<property name="ignoreResourceNotFound" value="true" />
 		<property name="locations">
 			<list>
-				<value>application.properties</value>
+				<value>file:#{systemProperties['conf.file']}</value>
 			</list>
 		</property>
 	</bean>

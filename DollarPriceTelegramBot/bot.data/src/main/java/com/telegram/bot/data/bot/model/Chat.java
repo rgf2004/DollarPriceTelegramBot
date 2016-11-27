@@ -59,6 +59,10 @@ public class Chat implements Serializable{
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "INSERTION_DATE")
 	private Date insertionDate;
+	
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "LAST_VISIT_DATE")
+	private Date lastVisitDate;
 
 	public long getChatId() {
 		return chatId;
@@ -124,10 +128,22 @@ public class Chat implements Serializable{
 		this.insertionDate = insertionDate;
 	}
 
+	public Date getLastVisitDate() {
+		return lastVisitDate;
+	}
+
+	public void setLastVisitDate(Date lastVisitDate) {
+		this.lastVisitDate = lastVisitDate;
+	}
+
 	@PrePersist
 	protected void onCreate() {
 		if (insertionDate == null) {
 			insertionDate = new Date();
+		}
+		
+		if (lastVisitDate == null) {
+			lastVisitDate = new Date();
 		}
 	}
 

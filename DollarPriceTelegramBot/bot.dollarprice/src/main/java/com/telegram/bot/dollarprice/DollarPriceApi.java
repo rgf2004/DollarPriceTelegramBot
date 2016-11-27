@@ -14,6 +14,7 @@ import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -35,6 +36,9 @@ import gui.ava.html.image.generator.HtmlImageGenerator;
 public class DollarPriceApi implements Runnable {
 
 	final static Logger logger = LoggerFactory.getLogger(DollarPriceApi.class);
+	
+	@Autowired
+	TelegramConfig telegramConfig;
 
 	private Properties config = new Properties();
 
@@ -157,7 +161,7 @@ public class DollarPriceApi implements Runnable {
 
 		String html = getCurrencyQueryResultAsHtml(currencyDetails, priceLabel);
 
-		File tempFile = new File(TelegramConfig.getProperty(TelegramConstants.TEMP_FOLDER_PATH) + "/"
+		File tempFile = new File(telegramConfig.getProperty(TelegramConstants.TEMP_FOLDER_PATH) + "/"
 				+ String.valueOf(new Date().getTime()) + ".png");
 
 		htmlImageGenerator.loadHtml(html);
@@ -178,7 +182,7 @@ public class DollarPriceApi implements Runnable {
 		Configuration cfg = new Configuration();
 
 		try {
-			cfg.setDirectoryForTemplateLoading(new File(TelegramConfig.getProperty(TelegramConstants.TEMPLATE_PATH)));
+			cfg.setDirectoryForTemplateLoading(new File(telegramConfig.getProperty(TelegramConstants.TEMPLATE_PATH)));
 			Template template = cfg.getTemplate(DollarPriceConstants.TEMPLATE_NAME);
 			Map<String, Object> data = new HashMap<String, Object>();
 

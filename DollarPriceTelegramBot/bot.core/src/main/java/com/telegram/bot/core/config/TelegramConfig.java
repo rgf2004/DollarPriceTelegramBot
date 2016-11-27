@@ -1,37 +1,23 @@
 package com.telegram.bot.core.config;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.PropertySources;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Service;
 
+@Configuration
+@PropertySources({@PropertySource(value = "classpath:application.properties", ignoreResourceNotFound = true),
+	   @PropertySource(value = "file:${conf.file}", ignoreResourceNotFound = true)})
+@Service	
 public class TelegramConfig {
 
-	private static final String propertiesFileName = "application.properties";
+	@Autowired
+	private Environment env;
 	
-	private Properties config = new Properties();
-
-	private InputStream input = null;
-	
-	private static TelegramConfig singelton = new TelegramConfig();	
-	
-	private TelegramConfig()
+	public String getProperty(String key)
 	{
-		input = this.getClass().getClassLoader().getResourceAsStream(propertiesFileName);
-		try {
-			config.load(input);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
-	public static String getProperty(String key)
-	{
-		return singelton.getConfig().getProperty(key);
-	}
-	
-	private Properties getConfig()
-	{
-		return config;
+		return env.getProperty(key);
 	}
 }
