@@ -49,24 +49,13 @@ public abstract class TelegramBot extends TelegramLongPollingBot implements Runn
 
 	public void onUpdateReceived(Update update) {
 
-		
-		logger.info("Update Recieved {}",update.toString());
-		
-		SendPhoto sendMessageRequest = null;
+		logger.info("Update Recieved {}", update.toString());
 
-		sendMessageRequest = handleIncomingMessage(update);
+		handleIncomingMessage(update);
 
-		try {
-			
-			sendPhoto(sendMessageRequest);
-			
-		} catch (TelegramApiException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 
-	public abstract SendPhoto handleIncomingMessage(Update update) ;
+	public abstract void handleIncomingMessage(Update update);
 
 	public String getBotUsername() {
 		return databaseBot.getBotUserName();
@@ -96,9 +85,13 @@ public abstract class TelegramBot extends TelegramLongPollingBot implements Runn
 				e.printStackTrace();
 			}
 
-			return ;
+			return;
 		}
-		return ;
+		else
+		{
+			
+		}
+		return;
 	}
 
 	public void run() {

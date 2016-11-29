@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.context.ApplicationContext;
+import org.telegram.telegrambots.TelegramApiException;
+import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -26,7 +28,7 @@ public class DollarPriceTelegramBot extends TelegramBot
 	}
 
 	@Override
-	public SendPhoto handleIncomingMessage(Update update) {
+	public void handleIncomingMessage(Update update) {
 				
 		String chatID = null;
 		String userQuery = null;
@@ -43,13 +45,19 @@ public class DollarPriceTelegramBot extends TelegramBot
 			userQuery = update.getCallbackQuery().getData();
 		}
 		
+		
 		SendPhoto sendPhotoRequest = new SendPhoto();
 		sendPhotoRequest.setNewPhoto(dollarPriceApi.getUSDCurrentCurrencyDetailsImage(userQuery));
-		//sendPhotoRequest.setCaption(dollarPriceApi.getImageCaption());
 		sendPhotoRequest.setReplyMarkup(getKeyboardMarkup(update));
 		sendPhotoRequest.setChatId(chatID);
 		
-		return sendPhotoRequest;
+		try {
+			sendPhoto(sendPhotoRequest);
+		} catch (TelegramApiException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 
 	}
 	
