@@ -6,11 +6,14 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Random;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +39,7 @@ import gui.ava.html.image.generator.HtmlImageGenerator;
 public class DollarPriceApi implements Runnable {
 
 	final static Logger logger = LoggerFactory.getLogger(DollarPriceApi.class);
-	
+
 	@Autowired
 	TelegramConfig telegramConfig;
 
@@ -132,7 +135,7 @@ public class DollarPriceApi implements Runnable {
 
 		tempFile = saveCurrencyQueryResultAsImage(tempCurrencyDetails,
 				config.getProperty(DollarPriceConstants.HTML_DOLLAR_PRICE_LABEL), usdCurrentCurrencyDetailsImage);
-		
+
 		usdCurrentCurrencyDetailsImage = tempFile;
 
 		tempCurrencyDetails = new CurrencyDetails();
@@ -147,9 +150,9 @@ public class DollarPriceApi implements Runnable {
 		tempCurrencyDetails.setBestBuyBank(getBestBuyBankPrice(banksPrices));
 		tempCurrencyDetails.setLastUpdate(new Date());
 
-		tempFile= saveCurrencyQueryResultAsImage(tempCurrencyDetails,
+		tempFile = saveCurrencyQueryResultAsImage(tempCurrencyDetails,
 				config.getProperty(DollarPriceConstants.HTML_EURO_PRICE_LABEL), euroCurrentCurrencyDetailsImage);
-		
+
 		euroCurrentCurrencyDetailsImage = tempFile;
 
 	}
@@ -173,7 +176,7 @@ public class DollarPriceApi implements Runnable {
 				currentImageFile.delete();
 			}
 		}
-		
+
 		return tempFile;
 	}
 
@@ -274,7 +277,17 @@ public class DollarPriceApi implements Runnable {
 		while (true) {
 			refreshCurrencyDetails();
 			try {
-				Thread.sleep(DollarPriceConstants.REFRESH_INTERVAL);
+				// Thread.sleep(DollarPriceConstants.REFRESH_INTERVAL);
+				int sleepTime;
+				if (!isOffWork())
+					sleepTime = getRandomNumberInRange(1, 30);
+				else
+					sleepTime = getRandomNumberInRange(1, 90);
+
+				logger.info("Refresh Sleep Time will be {} Minutes", sleepTime);
+
+				Thread.sleep(sleepTime * 60 * 1000);
+
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -282,4 +295,26 @@ public class DollarPriceApi implements Runnable {
 		}
 
 	}
+
+	private int getRandomNumberInRange(int min, int max) {
+
+		Random r = new Random();
+		return r.ints(min, (max + 1)).limit(1).findFirst().getAsInt();
+
+	}
+
+	private boolean isOffWork() {
+		Calendar calendar = GregorianCalendar.getInstance(); // creates a new
+																// calendar
+																// instance
+		calendar.setTime(new Date()); // assigns calendar to given date
+		int currentHour = calendar.get(Calendar.HOUR_OF_DAY); // gets hour in
+																// 24h format
+		if (currentHour > 8 && currentHour < 17) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+
 }

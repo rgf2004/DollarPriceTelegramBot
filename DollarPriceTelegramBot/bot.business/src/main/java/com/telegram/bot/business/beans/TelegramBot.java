@@ -80,16 +80,16 @@ public abstract class TelegramBot extends TelegramLongPollingBot implements Runn
 
 			try {
 				chatHandler.saveChat(chat);
+				logger.info("New User Has been added current users count {}",
+						chatHandler.getChatsByBotId(databaseBot.getBotId()).size());
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
 			return;
-		}
-		else
-		{
-			
+		} else {
+
 		}
 		return;
 	}
