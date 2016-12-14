@@ -1,5 +1,7 @@
 package com.telegram.bot.dollarprice;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,4 +28,28 @@ public class BankParserTest {
 			System.out.print(bankPrice);
 		}
 	}
+	
+	
+	@Test
+	public void test()
+	{
+//		try {
+//		    Document doc = Jsoup.connect("http://www.cibeg.com/_layouts/15/LINKDev.CIB.CurrenciesFunds/FundsCurrencies.aspx/GetCurrencies")
+//		                    .userAgent("Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.99 Safari/537.36")
+//		                    .header("Accept", "application/json")
+//		                    .header("Accept-Encoding", "gzip,deflate,sdch")
+//		                    .header("Accept-Language", "es-ES,es;q=0.8")
+//		                    .header("Connection", "keep-alive")
+//		                    .header("X-Requested-With", "XMLHttpRequest")
+//		                    .header("Content-Type", "application/json; charset=utf-8")
+//		                    .data("{'lang':'en'}", "")
+//		                    .post(); 
+//
+//		    System.out.println(doc.toString());
+//
+//		} catch (Exception e) {
+//		    e.printStackTrace();
+//		}
+	}
 }
+

@@ -1,6 +1,8 @@
 package com.telegram.bot.dollarprice.server.bankshandlers;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -42,6 +44,9 @@ public class BanksManager {
 				bankPrices.add(bankPrice);
 			}
 		}
+		
+		Collections.sort(bankPrices);
+		
 		return bankPrices;
 	}
 }
