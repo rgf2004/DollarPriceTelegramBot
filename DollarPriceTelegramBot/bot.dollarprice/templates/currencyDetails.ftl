@@ -1,6 +1,6 @@
 <html dir="rtl">
 	<head>
-
+		<meta charset="UTF-8">
 		<style type="text/css">
 			table.imagetable {
 				font-family: verdana,arial,sans-serif;
@@ -55,26 +55,26 @@
 				<table class="imagetable">
 					<tr>
 						<th>
+							${bank_keyword_label}
+						</th>
+						<th>
 							${sell_keyword_label}
 						</th>
 						<th>
 							${buy_keyword_label}
-						</th>
-						<th>
-							${bank_keyword_label}
-						</th>
+						</th>						
 					</tr>
 					<#list banks as bank>											
 						<tr>
+							<td>
+								${bank.bank.name_ar}
+							</td>
 							<td align="center">
 								${bank.sell?string["00.00"]}								
 							</td>
 							<td align="center">
 								${bank.buy?string["00.00"]}
-							</td>
-							<td>
-								${bank.bank.name_ar}
-							</td>
+							</td>							
 						</tr>						
 					</#list>
 				</table>
@@ -82,5 +82,4 @@
 		</div>
 	</body>
 </html>
-				 
-			 
+							

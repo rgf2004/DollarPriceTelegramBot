@@ -42,8 +42,17 @@ public class BotsManager implements Runnable {
 
 	@Override
 	public void run() {
+		
+//		try {
+//			Thread.sleep(60000);
+//		} catch (InterruptedException e2) {
+//			// TODO Auto-generated catch block
+//			e2.printStackTrace();
+//		}
+		
 		while (true) {
-
+			
+			
 			logger.debug("Start Checking For New Bots ... ");
 
 			long botsCount = botsCache.size();
@@ -58,14 +67,13 @@ public class BotsManager implements Runnable {
 
 			for (Bot bot : bots) {
 				if (!botsCache.containsKey(bot.getBotToken())) {
-
-					logger.info("Register New BOT [{}]", bot.getBotName());
-
+					
 					botsCache.put(bot.getBotToken(), bot);
 
 					try {
 						//telegramBotsApi.registerBot(new TelegramBot(appContext, bot));
 						telegramBotsApi.registerBot(new DollarPriceTelegramBot(appContext, bot));
+						logger.info("Register New BOT [{}]", bot.getBotName());
 					} catch (TelegramApiException e) {
 						logger.error("Error While initialized Bot " + bot.getBotUserName(), e);
 					}

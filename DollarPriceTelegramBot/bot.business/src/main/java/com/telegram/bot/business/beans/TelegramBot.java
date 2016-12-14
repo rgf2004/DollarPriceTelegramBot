@@ -22,7 +22,7 @@ import com.telegram.bot.data.bot.model.Notification;
 
 public abstract class TelegramBot extends TelegramLongPollingBot implements Runnable {
 
-	final static Logger logger = LoggerFactory.getLogger(TelegramBot.class);
+	protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	protected ApplicationContext context;
 

@@ -6,29 +6,28 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Random;
+
+import javax.annotation.PostConstruct;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.telegram.bot.core.config.TelegramConfig;
 import com.telegram.bot.core.constants.TelegramConstants;
-import com.telegram.bot.core.httpclient.HttpClient;
-import com.telegram.bot.core.httpclient.beans.HttpGetRequest;
+import com.telegram.bot.core.helper.SleepTimeGenerator;
 import com.telegram.bot.dollarprice.beans.BankPrice;
 import com.telegram.bot.dollarprice.beans.CurrencyDetails;
 import com.telegram.bot.dollarprice.constants.DollarPriceConstants;
+import com.telegram.bot.dollarprice.server.bankshandlers.BanksManager;
+import com.telegram.bot.dollarprice.server.enums.CurrencyCode;
 
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -36,25 +35,30 @@ import freemarker.template.TemplateException;
 import gui.ava.html.image.generator.HtmlImageGenerator;
 
 @Service
+@DependsOn({"sleepTimeGenerator","banksManager"})
 public class DollarPriceApi implements Runnable {
 
 	final static Logger logger = LoggerFactory.getLogger(DollarPriceApi.class);
 
 	@Autowired
 	TelegramConfig telegramConfig;
+	
+	@Autowired
+	BanksManager banksManager;
+	
+	@Autowired
+	SleepTimeGenerator sleepTimeGenerator;
 
 	private Properties config = new Properties();
 
-	InputStream input = null;
+	private InputStream input = null;
 
-	private HttpClient httpClient = new HttpClient();
-
-	private final String USD_URL = "https://eldollarbkam.com/api/prices/usd/";
 	private File usdCurrentCurrencyDetailsImage = null;
 
-	private final String EURO_URL = "https://eldollarbkam.com/api/prices/eur/";
 	private File euroCurrentCurrencyDetailsImage = null;
-
+	
+	private boolean isInitialized = false;
+	
 	public DollarPriceApi() {
 		input = this.getClass().getClassLoader().getResourceAsStream(DollarPriceConstants.propertiesFileName);
 
@@ -63,32 +67,21 @@ public class DollarPriceApi implements Runnable {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
-
+		}							
+	}
+	
+	@PostConstruct
+	public void init()
+	{
+		refreshCurrencyDetails();
+		isInitialized = true;
 		Thread thread = new Thread(this);
 		thread.start();
 	}
 
-	private List<BankPrice> getCurrentBankPrices(String URL) {
+	private List<BankPrice> getCurrentBankPrices(CurrencyCode currencyCode) {
 
-		ObjectMapper mapper = new ObjectMapper();
-
-		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-		mapper.setDateFormat(dateFormat);
-
-		HttpGetRequest request = new HttpGetRequest();
-		request.setURL(URL);
-		try {
-			String responseBody = httpClient.GetRequestJson(request);
-			List<BankPrice> bankPrices = mapper.readValue(responseBody, new TypeReference<List<BankPrice>>() {
-			});
-			return bankPrices;
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
+		return banksManager.getCurrencyBanksPrice(currencyCode);
 	}
 
 	private BankPrice getBestSellBankPrice(List<BankPrice> banksPrices) {
@@ -121,7 +114,7 @@ public class DollarPriceApi implements Runnable {
 
 		tempCurrencyDetails = new CurrencyDetails();
 
-		banksPrices = getCurrentBankPrices(USD_URL);
+		banksPrices = getCurrentBankPrices(CurrencyCode.USD);
 
 		if (banksPrices == null)
 			return;
@@ -140,7 +133,7 @@ public class DollarPriceApi implements Runnable {
 
 		tempCurrencyDetails = new CurrencyDetails();
 
-		banksPrices = getCurrentBankPrices(EURO_URL);
+		banksPrices = getCurrentBankPrices(CurrencyCode.EUR);
 
 		if (banksPrices == null)
 			return;
@@ -216,6 +209,8 @@ public class DollarPriceApi implements Runnable {
 			StringWriter strWriter = new StringWriter();
 			template.process(data, strWriter);
 
+			//System.out.println(strWriter.toString());
+
 			return strWriter.toString();
 
 		} catch (IOException | TemplateException e) {
@@ -274,20 +269,15 @@ public class DollarPriceApi implements Runnable {
 
 	@Override
 	public void run() {
-		while (true) {
-			refreshCurrencyDetails();
-			try {
-				// Thread.sleep(DollarPriceConstants.REFRESH_INTERVAL);
-				int sleepTime;
-				if (!isOffWork())
-					sleepTime = getRandomNumberInRange(1, 30);
-				else
-					sleepTime = getRandomNumberInRange(1, 90);
-
-				logger.info("Refresh Sleep Time will be {} Minutes", sleepTime);
-
-				Thread.sleep(sleepTime * 60 * 1000);
-
+				
+		while (true) {			
+			try 
+			{						
+				int sleepTime = sleepTimeGenerator.getRandomSleepTime();
+				logger.info("Refresh Image Sleep Time will be {} Minutes", sleepTime);
+				Thread.sleep(sleepTime);				
+				refreshCurrencyDetails();
+							
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -295,26 +285,8 @@ public class DollarPriceApi implements Runnable {
 		}
 
 	}
-
-	private int getRandomNumberInRange(int min, int max) {
-
-		Random r = new Random();
-		return r.ints(min, (max + 1)).limit(1).findFirst().getAsInt();
-
+	
+	public boolean isInitialized() {
+		return isInitialized;
 	}
-
-	private boolean isOffWork() {
-		Calendar calendar = GregorianCalendar.getInstance(); // creates a new
-																// calendar
-																// instance
-		calendar.setTime(new Date()); // assigns calendar to given date
-		int currentHour = calendar.get(Calendar.HOUR_OF_DAY); // gets hour in
-																// 24h format
-		if (currentHour > 8 && currentHour < 17) {
-			return false;
-		} else {
-			return true;
-		}
-	}
-
 }

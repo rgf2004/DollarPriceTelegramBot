@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.springframework.context.ApplicationContext;
 import org.telegram.telegrambots.TelegramApiException;
-import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -25,6 +24,20 @@ public class DollarPriceTelegramBot extends TelegramBot
 		super(ctxt, bot);
 		
 		dollarPriceApi = ctxt.getBean(DollarPriceApi.class);
+		
+		while(!dollarPriceApi.isInitialized())
+		{
+			//Wait
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}			
+		}
+		
+		logger.info("Dollar Price Bot has been initialized");
+		
 	}
 
 	@Override
@@ -45,7 +58,6 @@ public class DollarPriceTelegramBot extends TelegramBot
 			userQuery = update.getCallbackQuery().getData();
 		}
 		
-		
 		SendPhoto sendPhotoRequest = new SendPhoto();
 		sendPhotoRequest.setNewPhoto(dollarPriceApi.getUSDCurrentCurrencyDetailsImage(userQuery));
 		sendPhotoRequest.setReplyMarkup(getKeyboardMarkup(update));
@@ -58,6 +70,17 @@ public class DollarPriceTelegramBot extends TelegramBot
 			e.printStackTrace();
 		}
 		
+		/*
+		SendMessage message = new SendMessage();
+		message.setChatId(chatID);
+		message.setText(dollarPriceApi.getConfig().getProperty("bot_down_message"));
+		try {
+			sendMessage(message);
+		} catch (TelegramApiException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		*/
 
 	}
 	

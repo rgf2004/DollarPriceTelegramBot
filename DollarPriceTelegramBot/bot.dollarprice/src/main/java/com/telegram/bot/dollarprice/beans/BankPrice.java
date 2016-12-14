@@ -2,9 +2,11 @@ package com.telegram.bot.dollarprice.beans;
 
 import java.util.Date;
 
+import com.telegram.bot.dollarprice.server.beans.BankDetails;
+
 public class BankPrice {
 
-	private Bank bank;
+	private BankDetails bank;
 	private Currency currency;
 	private Date added;
 	private double buy;
@@ -12,10 +14,10 @@ public class BankPrice {
 	private double sell;
 	private int sell_status;
 	
-	public Bank getBank() {
+	public BankDetails getBank() {
 		return bank;
 	}
-	public void setBank(Bank bank) {
+	public void setBank(BankDetails bank) {
 		this.bank = bank;
 	}
 	public Currency getCurrency() {
