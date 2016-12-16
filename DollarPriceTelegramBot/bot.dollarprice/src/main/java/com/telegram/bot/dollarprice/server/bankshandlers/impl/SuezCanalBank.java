@@ -31,7 +31,7 @@ public class SuezCanalBank extends AbstractBankHandler {
 	}
 
 	@Override
-	protected void getCurrenciesDetails() {
+	public void getCurrenciesDetails() {
 		Document doc = null;
 		try {
 			doc = Jsoup.connect("http://scbank.com.eg/CurrencyAll.aspx")

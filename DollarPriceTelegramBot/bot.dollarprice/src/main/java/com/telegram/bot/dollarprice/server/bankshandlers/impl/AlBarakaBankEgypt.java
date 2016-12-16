@@ -31,7 +31,7 @@ public class AlBarakaBankEgypt extends AbstractBankHandler {
 	}
 
 	@Override
-	protected void getCurrenciesDetails() {
+	public void getCurrenciesDetails() {
 		
 		Document doc = null;
 		try {

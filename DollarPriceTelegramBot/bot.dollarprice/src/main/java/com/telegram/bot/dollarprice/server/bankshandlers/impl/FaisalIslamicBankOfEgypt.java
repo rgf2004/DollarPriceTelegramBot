@@ -31,7 +31,7 @@ public class FaisalIslamicBankOfEgypt extends AbstractBankHandler {
 	}
 
 	@Override
-	protected void getCurrenciesDetails() {
+	public void getCurrenciesDetails() {
 		Document doc = null;
 		try {
 			doc = Jsoup.connect("http://www.faisalbank.com.eg/FIB/arabic/rate.html")
