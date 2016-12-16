@@ -11,5 +11,7 @@ public interface BankHandler {
 	public Currency getCurrencyDetail(CurrencyCode currencyCode);
 	
 	public BankDetails getBankDetails();
+	
+	public void getCurrenciesDetails();
 		
 }

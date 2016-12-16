@@ -17,7 +17,7 @@ import com.telegram.bot.dollarprice.server.enums.CurrencyCode;
 public class BankMisr extends AbstractBankHandler {
 
 	@Override
-	protected void getCurrenciesDetails() {
+	public void getCurrenciesDetails() {
 		Document doc = null;
 		try {
 			doc = Jsoup.connect("http://www.banquemisr.com/en/exchangerates")

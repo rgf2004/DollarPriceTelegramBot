@@ -31,7 +31,7 @@ public class HousingAndDevelopmentBank extends AbstractBankHandler {
 	}
 
 	@Override
-	protected void getCurrenciesDetails() {
+	public void getCurrenciesDetails() {
 		Document doc = null;
 		try {
 			doc = Jsoup.connect("http://www.hdb-egy.com/main.php?page=exhange")

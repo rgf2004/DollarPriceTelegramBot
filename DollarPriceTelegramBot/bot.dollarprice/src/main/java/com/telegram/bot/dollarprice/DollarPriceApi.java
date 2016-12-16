@@ -272,10 +272,8 @@ public class DollarPriceApi implements Runnable {
 				
 		while (true) {			
 			try 
-			{						
-				int sleepTime = sleepTimeGenerator.getRandomSleepTime();
-				logger.info("Refresh Image Sleep Time will be {} Minutes", sleepTime);
-				Thread.sleep(sleepTime);				
+			{										
+				Thread.sleep(60000);				
 				refreshCurrencyDetails();
 							
 			} catch (InterruptedException e) {

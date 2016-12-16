@@ -13,7 +13,7 @@ import com.telegram.bot.dollarprice.server.beans.Currency;
 import com.telegram.bot.dollarprice.server.enums.CurrencyCode;
 
 @Service
-public abstract class AbstractBankHandler implements BankHandler, Runnable {
+public abstract class AbstractBankHandler implements BankHandler {
 
 	@Autowired
 	SleepTimeGenerator sleepTimeGenerator;
@@ -22,32 +22,14 @@ public abstract class AbstractBankHandler implements BankHandler, Runnable {
 
 	protected Map<CurrencyCode, Currency> currencies = new HashMap<>();
 
-	protected abstract void getCurrenciesDetails();
-
 	public final void initializeHandler() {
 		logger.info("Start Initialize of Bank Handler [{}] ...", this.getBankDetails().getName());
-		getCurrenciesDetails();
-		Thread thread = new Thread(this);
-		thread.start();
+		getCurrenciesDetails();		
 	}
 
 	@Override
 	public final Currency getCurrencyDetail(CurrencyCode currencyCode) {
 		return currencies.get(currencyCode);
 	}
-
-	@Override
-	public final void run() {
-		while (true) {
-			try {
-				int sleepTime = sleepTimeGenerator.getRandomSleepTime();
-				logger.info("Bank Handler will sleep for {} mSec", sleepTime);
-				Thread.sleep(sleepTime);
-				getCurrenciesDetails();
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-	}
+	
 }
