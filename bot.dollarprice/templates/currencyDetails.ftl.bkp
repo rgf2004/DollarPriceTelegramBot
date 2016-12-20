@@ -1,0 +1,57 @@
+<html dir="rtl">
+	<head>
+		<style>
+			body {background-color: #FFFFFF;}
+		</style>
+	</head>
+	<body>
+		<div align="right">
+			<div>
+				<h1 style="font-family:Tahoma;font-weight: 450;font-size: 14px;">
+					${dollar_price_label}					
+				</h1>
+			</div>
+			<div style="font-family:Tahoma;font-weight: 350;font-size: 12px;">
+				${latest_update_date_label} &nbsp; ${latest_update_date}
+			</div>			
+		</div>
+		<div>
+			
+			<div align="right" style="font-family:Tahoma;font-weight: 350;font-size: 13px;">${best_sell_string}</div>
+			<div align="right" style="font-family:Tahoma;font-weight: 350;font-size: 13px;">${best_buy_string}</div>
+			
+			<br>
+			
+			<div dir="rtl">
+				<table dir="rtl" width="500" style="border-collapse: collapse;">
+					<tr>
+						<td align="center" style="border: 1px solid;padding: 5px;font-family:Tahoma;font-weight: 350;font-size: 14px;">
+							${sell_keyword_label}
+						</td>
+						<td align="center" style="border: 1px solid;padding: 5px;font-family:Tahoma;font-weight: 350;font-size: 14px;">
+							${buy_keyword_label}
+						</td>
+						<td align="center" style="border: 1px solid;padding: 5px;font-family:Tahoma;font-weight: 350;font-size: 14px;">
+							${bank_keyword_label}
+						</td>
+					</tr>
+					<#list banks as bank>											
+						<tr>
+							<td align="center" style="border: 1px solid;padding: 5px;font-family:Tahoma;font-weight: 350;font-size: 14px;">
+								${bank.sell?string["00.00"]}								
+							</td>
+							<td align="center" style="border: 1px solid;padding: 5px;font-family:Tahoma;font-weight: 350;font-size: 14px;">
+								${bank.buy?string["00.00"]}
+							</td>
+							<td align="center" style="border: 1px solid;padding: 5px;font-family:Tahoma;font-weight: 350;font-size: 14px;">
+								${bank.bank.name_ar}
+							</td>
+						</tr>						
+					</#list>
+				</table>
+			</div>				
+		</div>
+	</body>
+</html>
+				 
+			 
