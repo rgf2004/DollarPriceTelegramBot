@@ -35,17 +35,17 @@ import freemarker.template.TemplateException;
 import gui.ava.html.image.generator.HtmlImageGenerator;
 
 @Service
-@DependsOn({"sleepTimeGenerator","banksManager"})
+@DependsOn({ "sleepTimeGenerator", "banksManager" })
 public class DollarPriceApi implements Runnable {
 
 	final static Logger logger = LoggerFactory.getLogger(DollarPriceApi.class);
 
 	@Autowired
 	TelegramConfig telegramConfig;
-	
+
 	@Autowired
 	BanksManager banksManager;
-	
+
 	@Autowired
 	SleepTimeGenerator sleepTimeGenerator;
 
@@ -56,9 +56,9 @@ public class DollarPriceApi implements Runnable {
 	private File usdCurrentCurrencyDetailsImage = null;
 
 	private File euroCurrentCurrencyDetailsImage = null;
-	
+
 	private boolean isInitialized = false;
-	
+
 	public DollarPriceApi() {
 		input = this.getClass().getClassLoader().getResourceAsStream(DollarPriceConstants.propertiesFileName);
 
@@ -67,16 +67,19 @@ public class DollarPriceApi implements Runnable {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}							
+		}
 	}
-	
+
 	@PostConstruct
-	public void init()
-	{
-		refreshCurrencyDetails();
-		isInitialized = true;
-		Thread thread = new Thread(this);
-		thread.start();
+	public void init() {
+		try {
+			refreshCurrencyDetails();
+			isInitialized = true;
+			Thread thread = new Thread(this);
+			thread.start();
+		} catch (Exception ex) {
+
+		}
 	}
 
 	private List<BankPrice> getCurrentBankPrices(CurrencyCode currencyCode) {
@@ -209,7 +212,7 @@ public class DollarPriceApi implements Runnable {
 			StringWriter strWriter = new StringWriter();
 			template.process(data, strWriter);
 
-			//System.out.println(strWriter.toString());
+			// System.out.println(strWriter.toString());
 
 			return strWriter.toString();
 
@@ -269,13 +272,12 @@ public class DollarPriceApi implements Runnable {
 
 	@Override
 	public void run() {
-				
-		while (true) {			
-			try 
-			{										
-				Thread.sleep(60000);				
+
+		while (true) {
+			try {
+				Thread.sleep(60000);
 				refreshCurrencyDetails();
-							
+
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -283,7 +285,7 @@ public class DollarPriceApi implements Runnable {
 		}
 
 	}
-	
+
 	public boolean isInitialized() {
 		return isInitialized;
 	}

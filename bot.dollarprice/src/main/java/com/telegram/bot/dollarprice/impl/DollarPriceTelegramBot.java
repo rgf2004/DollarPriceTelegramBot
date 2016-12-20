@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.context.ApplicationContext;
-import org.telegram.telegrambots.TelegramApiException;
+import org.telegram.telegrambots.exceptions.TelegramApiException;
 import org.telegram.telegrambots.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.api.objects.replykeyboard.InlineKeyboardMarkup;

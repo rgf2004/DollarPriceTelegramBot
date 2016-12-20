@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
-import org.telegram.telegrambots.TelegramApiException;
+import org.telegram.telegrambots.exceptions.TelegramApiException;
 import org.telegram.telegrambots.TelegramBotsApi;
 
 import com.telegram.bot.business.beans.TelegramBot;
