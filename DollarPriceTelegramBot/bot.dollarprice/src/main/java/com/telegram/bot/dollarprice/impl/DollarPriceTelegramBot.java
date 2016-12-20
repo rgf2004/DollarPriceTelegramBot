@@ -4,14 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.context.ApplicationContext;
+import org.telegram.telegrambots.TelegramApiException;
 import org.telegram.telegrambots.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.api.objects.replykeyboard.ReplyKeyboard;
-import org.telegram.telegrambots.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.api.objects.replykeyboard.buttons.InlineKeyboardButton;
-import org.telegram.telegrambots.api.objects.replykeyboard.buttons.KeyboardButton;
-import org.telegram.telegrambots.api.objects.replykeyboard.buttons.KeyboardRow;
 
 import com.telegram.bot.business.beans.TelegramBot;
 import com.telegram.bot.data.bot.model.Bot;
@@ -26,30 +24,63 @@ public class DollarPriceTelegramBot extends TelegramBot
 		super(ctxt, bot);
 		
 		dollarPriceApi = ctxt.getBean(DollarPriceApi.class);
+		
+		while(!dollarPriceApi.isInitialized())
+		{
+			//Wait
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}			
+		}
+		
+		logger.info("Dollar Price Bot has been initialized");
+		
 	}
 
 	@Override
-	public SendPhoto handleIncomingMessage(Update update) {
+	public void handleIncomingMessage(Update update) {
 				
 		String chatID = null;
+		String userQuery = null;
 		
 		if (update.getMessage() != null)
 		{
 			handleFirstTime(update.getMessage());
 			chatID = update.getMessage().getChatId().toString();
+			userQuery = update.getMessage().getText();
 		}
 		else
 		{
 			chatID = update.getCallbackQuery().getMessage().getChatId().toString();
+			userQuery = update.getCallbackQuery().getData();
 		}
 		
 		SendPhoto sendPhotoRequest = new SendPhoto();
-		sendPhotoRequest.setNewPhoto(dollarPriceApi.getUSDCurrentCurrencyDetailsImage());
-		//sendPhotoRequest.setCaption(dollarPriceApi.getImageCaption());
+		sendPhotoRequest.setNewPhoto(dollarPriceApi.getUSDCurrentCurrencyDetailsImage(userQuery));
 		sendPhotoRequest.setReplyMarkup(getKeyboardMarkup(update));
 		sendPhotoRequest.setChatId(chatID);
 		
-		return sendPhotoRequest;
+		try {
+			sendPhoto(sendPhotoRequest);
+		} catch (TelegramApiException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		/*
+		SendMessage message = new SendMessage();
+		message.setChatId(chatID);
+		message.setText(dollarPriceApi.getConfig().getProperty("bot_down_message"));
+		try {
+			sendMessage(message);
+		} catch (TelegramApiException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		*/
 
 	}
 	

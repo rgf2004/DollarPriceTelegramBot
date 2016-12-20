@@ -2,9 +2,11 @@ package com.telegram.bot.dollarprice.beans;
 
 import java.util.Date;
 
-public class BankPrice {
+import com.telegram.bot.dollarprice.server.beans.BankDetails;
 
-	private Bank bank;
+public class BankPrice implements Comparable {
+
+	private BankDetails bank;
 	private Currency currency;
 	private Date added;
 	private double buy;
@@ -12,10 +14,10 @@ public class BankPrice {
 	private double sell;
 	private int sell_status;
 	
-	public Bank getBank() {
+	public BankDetails getBank() {
 		return bank;
 	}
-	public void setBank(Bank bank) {
+	public void setBank(BankDetails bank) {
 		this.bank = bank;
 	}
 	public Currency getCurrency() {
@@ -53,6 +55,17 @@ public class BankPrice {
 	}
 	public void setSell_status(int sell_status) {
 		this.sell_status = sell_status;
+	}
+	
+	@Override
+	public int compareTo(Object o) {
+		
+		BankPrice otherObject = (BankPrice)o;
+		
+		if (buy == otherObject.getBuy())
+			return 0;
+		
+		return buy < otherObject.getBuy() ? 1 : -1;		
 	}
 	
 }

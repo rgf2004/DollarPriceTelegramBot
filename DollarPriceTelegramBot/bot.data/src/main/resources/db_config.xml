@@ -44,8 +44,9 @@
 		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
 		<property name="ignoreResourceNotFound" value="true" />
 		<property name="locations">
-			<list>
-				<value>db-config.properties</value>
+			<list>				
+				<value>classpath:application.properties</value>
+				<value>file:#{systemProperties['conf.file']}</value>
 			</list>
 		</property>
 	</bean>

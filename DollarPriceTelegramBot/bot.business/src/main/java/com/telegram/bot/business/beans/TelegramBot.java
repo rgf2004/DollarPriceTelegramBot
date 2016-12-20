@@ -22,7 +22,7 @@ import com.telegram.bot.data.bot.model.Notification;
 
 public abstract class TelegramBot extends TelegramLongPollingBot implements Runnable {
 
-	final static Logger logger = LoggerFactory.getLogger(TelegramBot.class);
+	protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	protected ApplicationContext context;
 
@@ -49,24 +49,13 @@ public abstract class TelegramBot extends TelegramLongPollingBot implements Runn
 
 	public void onUpdateReceived(Update update) {
 
-		
-		logger.info("Update Recieved {}",update.toString());
-		
-		SendPhoto sendMessageRequest = null;
+		logger.info("Update Recieved {}", update.toString());
 
-		sendMessageRequest = handleIncomingMessage(update);
+		handleIncomingMessage(update);
 
-		try {
-			
-			sendPhoto(sendMessageRequest);
-			
-		} catch (TelegramApiException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 
-	public abstract SendPhoto handleIncomingMessage(Update update) ;
+	public abstract void handleIncomingMessage(Update update);
 
 	public String getBotUsername() {
 		return databaseBot.getBotUserName();
@@ -91,14 +80,18 @@ public abstract class TelegramBot extends TelegramLongPollingBot implements Runn
 
 			try {
 				chatHandler.saveChat(chat);
+				logger.info("New User Has been added current users count {}",
+						chatHandler.getChatsByBotId(databaseBot.getBotId()).size());
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
-			return ;
+			return;
+		} else {
+
 		}
-		return ;
+		return;
 	}
 
 	public void run() {
