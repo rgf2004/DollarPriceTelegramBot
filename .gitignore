@@ -51,3 +51,4 @@ dependency-reduced-pom.xml
 .recommenders
 .metadata
 RemoteSystemsTempFiles
+bin
