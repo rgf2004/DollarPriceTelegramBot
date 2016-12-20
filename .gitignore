@@ -48,3 +48,6 @@ composer.lock
 target
 .classpath
 dependency-reduced-pom.xml
+.recommenders
+.metadata
+RemoteSystemsTempFiles
